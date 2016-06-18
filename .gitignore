@@ -28,5 +28,5 @@
 *.out
 *.app
 
-#MacOS stuff
-.DS_Store
+# MacOS stuff
+*.DS_Store
