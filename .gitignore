@@ -30,3 +30,6 @@
 
 # MacOS stuff
 *.DS_Store
+
+# Make output
+*.depend
