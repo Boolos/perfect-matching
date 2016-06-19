@@ -1,3 +1,8 @@
 # Perfect Matching Algorithm
 
-Class repo for the perfect matching coding solution.  There's no makefile at this time, so everything is compiled manually.  Feel free to change this. :smile:
+####Class repo for the perfect matching coding solution.
+To build from command line:
+- `make`
+
+To run from command line:
+- `./app.out`
