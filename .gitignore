@@ -33,3 +33,6 @@
 
 # Make output
 *.depend
+
+# VS code config
+.vscode/

@@ -6,6 +6,9 @@ OBJS=$(subst .cpp,.o,$(SRCS))
 
 all: app
 
+tests: 
+	$(CPP) $(CPPFLAGS) tests.cpp -o tests.out
+
 app: $(OBJS)
 	$(CPP) -o app.out $(OBJS)
 
