@@ -1,7 +1,7 @@
 CPP=clang++
 CPPFLAGS=-Wall -std=c++11
 RM=rm -f
-SRCS=edge.cpp edge_set.cpp graph.cpp main.cpp matrix.cpp polynomial.cpp vertex.cpp
+SRCS=edge.cpp edge_set.cpp graph.cpp main.cpp matrix.cpp polynomial.cpp solution.cpp vertex.cpp
 OBJS=$(subst .cpp,.o,$(SRCS))
 
 all: app
