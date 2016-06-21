@@ -9,7 +9,7 @@
 namespace csce {
 	class graph {
 	public:
-		bool sparse() const;
+		bool is_sparse() const;
 		graph perfect_matching();
 		edge_set edges() const;
 		std::vector<vertex> vertices() const;
