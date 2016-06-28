@@ -12,6 +12,7 @@
 namespace csce {
 	class matrix {
 	public:
+        matrix();
 		matrix(csce::edge_set e, csce::edge_set s);
 		csce::polynomial determinant();
 		

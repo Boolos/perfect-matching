@@ -1,8 +1,8 @@
 CPP=clang++
-CPPFLAGS=-Wall -std=c++11
+CPPFLAGS=-Wall -std=c++11 -stdlib=libc++
 RM=rm -f
 SRCS=edge.cpp edge_set.cpp graph.cpp matrix.cpp polynomial.cpp solution.cpp vertex.cpp
-TEST_SRCS=tests.cpp polynomial_tests.cpp edge_set_tests.cpp matrix_tests.cpp solution_tests.cpp
+TEST_SRCS=tests.cpp polynomial_tests.cpp edge_set_tests.cpp matrix_tests.cpp graph_tests.cpp solution_tests.cpp
 OBJS=$(subst .cpp,.o,$(SRCS))
 
 all: app

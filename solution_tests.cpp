@@ -15,13 +15,13 @@ SCENARIO("Perfect matching validation") {
 
 		GIVEN("and a set of edges that are a perfect matching in said graph") {
 			edge_set edgeset;
-			edgeset.edges.insert(edge(vertex(0), vertex(6)));
-			edgeset.edges.insert(edge(vertex(1), vertex(7)));
-			edgeset.edges.insert(edge(vertex(2), vertex(5)));
-			edgeset.edges.insert(edge(vertex(3), vertex(8)));
-			edgeset.edges.insert(edge(vertex(4), vertex(9)));
-			edgeset.edges.insert(edge(vertex(0), vertex(6)));
-			edgeset.edges.insert(edge(vertex(1), vertex(7)));
+			edgeset.add(edge(vertex(0), vertex(6)));
+			edgeset.add(edge(vertex(1), vertex(7)));
+			edgeset.add(edge(vertex(2), vertex(5)));
+			edgeset.add(edge(vertex(3), vertex(8)));
+			edgeset.add(edge(vertex(4), vertex(9)));
+			edgeset.add(edge(vertex(0), vertex(6)));
+			edgeset.add(edge(vertex(1), vertex(7)));
 
 			solution graphProblem(g, f);
 
@@ -37,9 +37,9 @@ SCENARIO("Perfect matching validation") {
 
 		GIVEN("and a set of edges that are not a perfect matching in said graph") {
 			edge_set edgeset;
-			edgeset.edges.insert(edge(vertex(1), vertex(2)));
-			edgeset.edges.insert(edge(vertex(3), vertex(4)));
-			edgeset.edges.insert(edge(vertex(2), vertex(3)));
+			edgeset.add(edge(vertex(1), vertex(2)));
+			edgeset.add(edge(vertex(3), vertex(4)));
+			edgeset.add(edge(vertex(2), vertex(3)));
 
 			solution graphProblem(g, f);
 

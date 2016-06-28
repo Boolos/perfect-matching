@@ -1,5 +1,7 @@
 #include "matrix.hpp"
 
+csce::matrix::matrix() { }
+
 csce::matrix::matrix(csce::edge_set e, csce::edge_set s) {
 	this->mat.clear();
 	int max = std::numeric_limits<int>::min();

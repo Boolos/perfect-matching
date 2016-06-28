@@ -25,7 +25,7 @@ SCENARIO("Finding the determinant of a matrix") {
 			polynomial determinant = matrix.determinant();
 
 			THEN("the resulting polynomial is correct") {
-				REQUIRE(determinant.str() == "1(x^4)(y^2)");
+				REQUIRE(determinant.str() == "(x^4)(y^2)");
 			}
 		}
 	}
