@@ -1,14 +1,20 @@
 #ifndef UARK_CSCE_VERTEX_HEADER
 #define UARK_CSCE_VERTEX_HEADER
 
+#include <vector>
 #include <unordered_set>
 
 namespace csce {
 	class vertex {
 	public:
 		int id;
-        int degree;
+        
 		vertex(int id);
+
+        void add_neighbor(const vertex& neighbor);
+
+        int degree() const; 
+        
 		bool operator ==(const vertex& other) const {
 			return id == other.id;
 		}
@@ -17,7 +23,7 @@ namespace csce {
 			return id < other.id;
 		}
 	private:
-		
+        std::vector<vertex> neighbors;
 	};
 
     struct vertex_hash {

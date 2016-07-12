@@ -36,6 +36,7 @@ namespace csce {
 		std::string str() const;
 		int degree() const;
 		long double leading_coefficient() const;
+        void replace(char var, int value);
 		
 		
 		csce::polynomial_gcd_t gcd(const csce::polynomial& other) const;

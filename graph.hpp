@@ -31,9 +31,7 @@ namespace csce {
         bool has_edges() const;
         edge_set get_redundant() const;
         edge_set get_matches() const;
-        int get_rank(const edge_set& e, const edge_set& s ) const;
-        matrix replace_indeterminates(const matrix& poly_matrix) const;
-        int get_max_degree(const polynomial& determinate) const;
+        int get_rank(const edge_set& s ) const;
 	};
 }
 

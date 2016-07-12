@@ -13,7 +13,9 @@ csce::matrix::matrix(csce::edge_set e, csce::edge_set s) {
 	for(int u=0; u<max; u++){
 		std::vector<csce::polynomial> row;
 		for(int v=0; v<max; v++){
-			csce::edge cur(u+1, v+1);
+            csce::vertex vertex_u(u+1);
+            csce::vertex vertex_v(v+1);
+			csce::edge cur(vertex_u, vertex_v);
 			if(s.contains(cur)){ //if {u, v} is in S
 				csce::polynomial p;
 				p.terms[{{'x', 1}, {'y', 1}}] = 1.0L;
@@ -72,4 +74,23 @@ std::vector< std::vector<csce::polynomial> > csce::matrix::submatrix(const std::
 		}
 	}
 	return result;
+}
+
+void csce::matrix::replace_indeterminates(int edge_count) {
+    // for each term, if x, replace with random number;
+    for (int row = 0; row < this->mat.size(); row++) {
+        for (int col = 0; col < this->mat[row].size(); col++) {
+           this->mat[row][col].replace('x', this->get_random_number(edge_count));
+        }
+    }
+}
+
+int csce::matrix::get_random_number(int edge_count) const {
+    int min = 1;
+    int max = std::pow(edge_count, 4);
+    std::random_device rd;
+    std::default_random_engine generator(rd());
+    std::uniform_int_distribution<int> distribution(min, max);
+
+    return distribution(generator);
 }

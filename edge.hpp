@@ -9,7 +9,7 @@ namespace csce {
 	public:
 		vertex u;
 		vertex v;
-		edge(vertex _u, vertex _v);
+		edge(const vertex& _u, const vertex& _v);
         bool is_incident_with_degree(int degree) const;
 		
 		bool operator ==(const csce::edge& other) const {

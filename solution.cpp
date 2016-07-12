@@ -13,7 +13,9 @@ csce::solution::solution(edge_set &edgeset, std::string f) {
 		for (int i = 0; i < numberOfEdges; i++)
 		{
 			infile >> a >> b;
-			edgeset.edges.insert(csce::edge(csce::vertex(a), csce::vertex(b)));
+            csce::vertex vertex_a(a);
+            csce::vertex vertex_b(b);
+			edgeset.add(csce::edge(vertex_a, vertex_b));
 			// somehow populate the vertices vector of g? FIXME
 		}
 		for (int i = 0; i < numberOfSolutions; i++) {

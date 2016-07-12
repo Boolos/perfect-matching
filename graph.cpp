@@ -10,9 +10,6 @@ graph::graph(const edge_set& set) {
         this->edges.add(e);
         this->verticies.insert(e.u);
         this->verticies.insert(e.v);
-        this->vs.emplace(e.u.id, e.u);
-        this->vs.emplace(e.v.id, e.v);
-        //vs[e.u.id].degree++;
     });
 }
 
@@ -42,6 +39,34 @@ edge_set graph::find_matching() const {
     }
 
     return matching;
+}
+
+edge_set graph::get_redundant() const {
+    edge_set redundant;
+    // get random subset S of E
+    edge_set s = this->edges.get_random_subset();
+    // foreach e in E - S, if Rank(S u e) == Rank(S) => add E to RE
+    edge_set diff = this->edges.difference(s);
+    for_each(diff.edges.begin(), diff.edges.end(), [&] (const edge& e) {
+        edge_set temp;
+        temp.add(e);
+        if (this->get_rank(s.union_set(temp)) == this->get_rank(s)) {
+            redundant.add(e);
+        }
+    });
+
+    return redundant;
+}
+
+int graph::get_rank(const edge_set& s) const {
+    // build matrix over E and S
+    matrix b(this->edges, s);
+
+    // replace indeterminate
+    b.replace_indeterminates(this->edges.edges.size());
+
+    // get max degree
+    return b.determinant().degree();
 }
 
 edge_set graph::get_matches() const {
@@ -76,10 +101,6 @@ void graph::remove_verticies(const unordered_set<vertex, vertex_hash>& verticies
     this->edges = this->edges.difference(edges_to_remove);
 }
 
-bool graph::is_perfect_matching(const edge_set& possible_matching) const {
-    return true;
-}
-
 bool graph::is_sparse() const {
     int sparse = floor(int(3.0 / 4 * this->verticies.size()));
 	return this->edges.edges.size() < sparse;
@@ -89,23 +110,9 @@ bool graph::has_edges() const {
     return this->edges.edges.size() > 0;
 }
 
-edge_set graph::get_redundant() const {
-    // get random subset S of E
-    // foreach e in E - S, if Rank(S u e) == Rank(S) => add E to RE
-    // return RE
-}
-
-int graph::get_rank(const edge_set& e, const edge_set& s) const {
-    // build matrix over E and S
-    // replace indeterminate
-    // get max degree
-}
-
-matrix graph::replace_indeterminates(const matrix& poly_matrix) const {
-    // generate random int in range of 1 to |IE|^4
-    // compute det(matrix) => polynomial
-}
-
-int graph::get_max_degree(const polynomial& determinate) const {
-    // iterate over polynomial getting max degree
+bool graph::is_perfect_matching(const edge_set& possible_matching) const {
+    int edges_in_matching_count = possible_matching.edges.size();
+    int verticies_in_graph_count = this->verticies.size();
+    int half_the_number_of_verticies = floor(int(verticies_in_graph_count / 2.0));
+    return edges_in_matching_count <= half_the_number_of_verticies;
 }

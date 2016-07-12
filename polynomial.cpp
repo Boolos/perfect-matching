@@ -276,3 +276,13 @@ csce::polynomial_gcd_t csce::polynomial::gcd(const csce::polynomial& b) const {
 	
 	return result;
 }
+
+void csce::polynomial::replace(char var, int value) {
+	for(auto& term : this->terms){
+		for(auto& v : term.first){
+            if (v.first == var) {
+                this->terms.erase(term.first);
+            }
+		}
+	}
+}

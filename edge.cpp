@@ -2,8 +2,8 @@
 
 using namespace csce;
 
-edge::edge(vertex _u, vertex _v) : u(_u), v(_v) { }
+edge::edge(const vertex& _u, const vertex& _v) : u(_u), v(_v) { }
 
 bool edge::is_incident_with_degree(int degree) const {
-    return this->u.degree == degree || this->v.degree == degree;
+    return degree == this->u.degree() || degree == this->v.degree();
 }

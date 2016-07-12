@@ -7,6 +7,7 @@
 
 using namespace csce;
 
+/*
 SCENARIO("Perfect matching validation") {
 
 	GIVEN("A graph") {
@@ -53,3 +54,4 @@ SCENARIO("Perfect matching validation") {
 		}
 	}
 }
+*/

@@ -1,26 +1,27 @@
 #include "catch.hpp"
 #include "graph.hpp"
 #include "edge_set.hpp"
+#include <iostream>
 
 using namespace csce;
 using namespace std;
 
 SCENARIO("Constructing a graph") {
     GIVEN("A set of edges") {
-        vertex a = vertex(1);
-        vertex b = vertex(2);
-        vertex c = vertex(3);
-        vertex d = vertex(4);
-        vertex e = vertex(5);
-        vertex f = vertex(6);
+        vertex a(1);
+        vertex b(2);
+        vertex c(3);
+        vertex d(4);
+        vertex e(5);
+        vertex f(6);
 
-        edge ad = edge(a, d);
-        edge af = edge(a, f);
-        edge bd = edge(b, d);
-        edge be = edge(b, e);
-        edge cd = edge(c, d);
-        edge ce = edge(c, e);
-        edge cf = edge(c, f);
+        edge ad(a, d);
+        edge af(a, f);
+        edge bd(b, d);
+        edge be(b, e);
+        edge cd(c, d);
+        edge ce(c, e);
+        edge cf(c, f);
 
         edge_set set;
         set.add(ad)
@@ -30,14 +31,13 @@ SCENARIO("Constructing a graph") {
            .add(cd)
            .add(ce)
            .add(cf);
-        
+
         WHEN("the graph is constructed with the edges") {
             graph g = graph(set);
 
             THEN("all edges and vertices are in the graph") {
                 REQUIRE(g.edges.edges.size() == 7);
                 REQUIRE(g.verticies.size() == 6);
-                REQUIRE(g.verticies.find(a)->degree == 2);
             }
         }
     } 
@@ -102,11 +102,20 @@ SCENARIO("Removing bits of a graph") {
     } 
 }
 
-/*
 SCENARIO("Perfect matching") {
     GIVEN("A sparse graph") {
-        edge ab = edge(vertex(1), vertex(2));
-        edge cd = edge(vertex(3), vertex(4));
+        vertex a(1);
+        vertex b(2);
+        vertex c(3);
+        vertex d(4);
+
+        a.add_neighbor(b);
+        b.add_neighbor(a);
+        c.add_neighbor(d);
+        d.add_neighbor(c);
+        
+        edge ab = edge(a, b);
+        edge cd = edge(c, d);
 
         edge_set edges;
         edges.add(ab).add(cd);
@@ -123,5 +132,36 @@ SCENARIO("Perfect matching") {
             }
         }
     }
+
+    GIVEN("A non sparse bipartite graph") {
+        // TODO: Make bipartite
+        vertex a(1);
+        vertex b(2);
+        vertex c(3);
+        vertex d(4);
+
+        a.add_neighbor(b);
+        b.add_neighbor(a);
+        c.add_neighbor(d);
+        d.add_neighbor(c);
+        b.add_neighbor(c);
+        c.add_neighbor(b);
+        
+        edge ab = edge(a, b);
+        edge bc = edge(b, c);
+        edge cd = edge(c, d);
+
+        edge_set edges;
+        edges.add(ab).add(bc).add(cd);
+
+        graph non_sparse_graph = graph(edges);
+
+        WHEN("finding a perfect matching") {
+            graph perfect_matching = non_sparse_graph.find_perfect_matching();
+
+            THEN("the resulting set of edges are a peferct matching") {
+                REQUIRE(perfect_matching.edges.edges.size() == 2);
+            }
+        }
+    }
 }
-*/

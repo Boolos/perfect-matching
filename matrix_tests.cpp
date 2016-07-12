@@ -7,6 +7,7 @@
 
 using namespace csce;
 
+/*
 SCENARIO("Finding the determinant of a matrix") {
 	
 	GIVEN("The sets of edges e and s") {
@@ -30,3 +31,4 @@ SCENARIO("Finding the determinant of a matrix") {
 		}
 	}
 }
+*/
