@@ -16,6 +16,18 @@ edge_set &edge_set::add(const edge& edge) {
 	return *this;
 }
 
+edge_set &edge_set::add(int vertex_u, int vertex_v) {
+    
+}
+
+edge_set &edge_set::remove(const edge& edge) {
+    auto it = edges.find(edge);
+    if (it != edges.end()) {
+        edges.erase(*it);
+    }
+    return *this;
+}
+
 bool edge_set::contains(const edge& edge) const {
 	return edges.find(edge) != edges.end();
 }
@@ -23,12 +35,12 @@ bool edge_set::contains(const edge& edge) const {
 edge_set edge_set::difference(const edge_set& other) const {
     edge_set result;
 
-    for_each(edges.begin(), edges.end(), [&] (const edge& e) {
+    for_each(this->edges.begin(), this->edges.end(), [&] (const edge& e) {
         if (!other.contains(e)) {
             result.add(e);
         }
     });
-
+    
     return result;
 }
 

@@ -20,7 +20,7 @@ namespace csce {
         std::unordered_set<vertex, vertex_hash> verticies;
         std::unordered_map<int, vertex> vs;
 
-		graph find_perfect_matching() const;
+		edge_set find_perfect_matching() const;
         void remove_edges(const edge_set& edges_to_remove);
         void remove_verticies(const std::unordered_set<vertex, vertex_hash>& verticies_to_remove);
 		

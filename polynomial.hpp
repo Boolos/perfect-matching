@@ -1,11 +1,14 @@
 #ifndef UARK_CSCE_POLYNOMIAL_HEADER
 #define UARK_CSCE_POLYNOMIAL_HEADER
 
+#include <math.h>
+#include <limits>
 #include <vector>
 #include <map>
 #include <unordered_map>
 #include <string>
 #include <sstream>
+#include <iostream>
 
 
 namespace csce {
@@ -36,8 +39,7 @@ namespace csce {
 		std::string str() const;
 		int degree() const;
 		long double leading_coefficient() const;
-        void replace(char var, int value);
-		
+        csce::polynomial replace(char var, long double value);
 		
 		csce::polynomial_gcd_t gcd(const csce::polynomial& other) const;
 		

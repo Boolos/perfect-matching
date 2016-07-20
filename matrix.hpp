@@ -10,6 +10,7 @@
 #include "math.h"
 #include "edge_set.hpp"
 #include "polynomial.hpp"
+#include <iostream>
 
 namespace csce {
 	class matrix {
@@ -23,7 +24,7 @@ namespace csce {
 		std::vector< std::vector<csce::polynomial> > mat;
 		csce::polynomial determinant(const std::vector< std::vector<csce::polynomial> >& matrix) const;
 		std::vector< std::vector<csce::polynomial> > submatrix(const std::vector< std::vector<csce::polynomial> >& matrix, int col) const;
-        int get_random_number(int edge_count) const;
+        long double get_random_number(int edge_count) const;
 	};
 }
 

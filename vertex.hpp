@@ -8,13 +8,13 @@ namespace csce {
 	class vertex {
 	public:
 		int id;
-        
 		vertex(int id);
-
+        std::vector<vertex> neighbors;
         void add_neighbor(const vertex& neighbor);
-
+        void remove_neighbor(const vertex& neighbor);
         int degree() const; 
-        
+        void destroy();
+
 		bool operator ==(const vertex& other) const {
 			return id == other.id;
 		}
@@ -23,7 +23,6 @@ namespace csce {
 			return id < other.id;
 		}
 	private:
-        std::vector<vertex> neighbors;
 	};
 
     struct vertex_hash {

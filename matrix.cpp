@@ -78,16 +78,21 @@ std::vector< std::vector<csce::polynomial> > csce::matrix::submatrix(const std::
 
 void csce::matrix::replace_indeterminates(int edge_count) {
     // for each term, if x, replace with random number;
+    //std::cout << "ENTER" << std::endl;
     for (int row = 0; row < this->mat.size(); row++) {
+        //std::cout << "Row " << row << ": ";
         for (int col = 0; col < this->mat[row].size(); col++) {
-           this->mat[row][col].replace('x', this->get_random_number(edge_count));
+            auto p = this->mat[row][col].replace('x', this->get_random_number(edge_count));
+            this->mat[row][col] = p;
+            //std::cout << this->mat[row][col].str() << std::endl;
         }
     }
+
 }
 
-int csce::matrix::get_random_number(int edge_count) const {
-    int min = 1;
-    int max = std::pow(edge_count, 4);
+long double csce::matrix::get_random_number(int edge_count) const {
+    long double min = 1.0L;
+    long double max = std::pow((long double)edge_count, 4.0L);
     std::random_device rd;
     std::default_random_engine generator(rd());
     std::uniform_int_distribution<int> distribution(min, max);

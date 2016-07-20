@@ -4,7 +4,9 @@
 #include <random>
 #include <vector>
 #include <unordered_set>
+#include <list>
 #include "math.h"
+#include <iostream>
 #include "edge.hpp"
 #include "vertex.hpp"
 #include "polynomial.hpp"
@@ -15,7 +17,10 @@ namespace csce {
         edge_set();
         edge_set(const edge_set& edges);
 		std::unordered_set<edge, edge_hash> edges;
+        std::vector<std::list<vertex>> adjacency_list;
 		edge_set &add(const edge& edge);
+		edge_set &add(int vertex_u, int vertex_v);
+        edge_set &remove(const edge& edge);
 		bool contains(const edge& edge) const;
 		edge_set difference(const edge_set& set) const;
         edge_set get_random_subset() const;

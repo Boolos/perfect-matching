@@ -5,7 +5,7 @@
  * otherwise false is returned.
  */
 bool csce::iszero(long double value){
-	return std::fabsl(value) <= csce::EPS;
+	return fabsl(value) <= csce::EPS;
 }
 
 /**
@@ -13,7 +13,7 @@ bool csce::iszero(long double value){
  * csce::EPS and returns false otherwise.
  */
 bool csce::isequal(long double a, long double b){
-	return std::fabsl(a - b) <= csce::EPS;
+	return fabsl(a - b) <= csce::EPS;
 }
 
 /**
@@ -277,12 +277,19 @@ csce::polynomial_gcd_t csce::polynomial::gcd(const csce::polynomial& b) const {
 	return result;
 }
 
-void csce::polynomial::replace(char var, int value) {
-	for(auto& term : this->terms){
-		for(auto& v : term.first){
-            if (v.first == var) {
-                this->terms.erase(term.first);
+csce::polynomial csce::polynomial::replace(char var, long double value) {
+    csce::polynomial result;
+    for (auto& term : this->terms) {
+        std::unordered_map<char, int> build;
+
+        for (auto& term_part : term.first) {
+            if (term_part.first != var) {
+                build[term_part.first] = term_part.second;
             }
-		}
-	}
+        }
+        if (term.first.find('x') != term.first.end()) {
+            result.terms[build] = value;
+        }
+    }
+    return result;
 }

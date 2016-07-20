@@ -4,7 +4,6 @@
 
 using namespace csce;
 
-/*
 SCENARIO("Constructing an edge set") {
     edge_set set;
 
@@ -205,4 +204,3 @@ SCENARIO("Random subsets") {
         }
     }
 } 
-*/
