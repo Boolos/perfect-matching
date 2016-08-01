@@ -4,20 +4,18 @@
 
 using namespace csce;
 
+/*
 SCENARIO("Constructing an edge set") {
     edge_set set;
 
     GIVEN("An empty edge set and an edge") {
-        vertex u = vertex(1);
-        vertex v = vertex(2);
-        edge e = edge(u, v);
 
         WHEN("the edge is added to the set") {
-            set.add(e);
+            set.add(1, 2);
 
             THEN("the edge is a member of the set") {
-                REQUIRE(set.contains(e) == true);
-                REQUIRE(set.edges.size() == 1);
+                REQUIRE(set.contains(1, 2) == true);
+                REQUIRE(set.size_edges() == 1);
             }
         }
     }
@@ -168,39 +166,331 @@ SCENARIO("Determining set membership") {
 		}
 	}
 }
+*/
+
 
 SCENARIO("Random subsets") {
-    GIVEN("A set of edges") {
-        edge ad = edge(vertex(1), vertex(4));
-        edge af = edge(vertex(1), vertex(6));
-        edge bd = edge(vertex(2), vertex(4));
-        edge be = edge(vertex(2), vertex(5));
-        edge cd = edge(vertex(3), vertex(4));
-        edge ce = edge(vertex(3), vertex(5));
-        edge cf = edge(vertex(3), vertex(6));
-
+    GIVEN("A set and a subset") {
         edge_set set;
-        set.add(ad)
-           .add(af)
-           .add(bd)
-           .add(be)
-           .add(cd)
-           .add(ce)
-           .add(cf);
+        set.add(1,2).add(2,3).add(4,5);
+        edge_set sub_set;
+        sub_set.add(2,3);
+
+        WHEN("checking for a sub set") {
+            bool is_sub_set = set.is_sub_set(sub_set);
+
+            THEN("it is a sub set") {
+                REQUIRE(is_sub_set == true);
+            }
+        }
+    }
+
+    GIVEN("A set of edges") {
+        edge_set edges;
+        edges.add(1,4).add(1,6).add(2,4).add(2,5)
+             .add(3,4).add(3,5).add(3,6);
 
         WHEN("a random subset is requested") {
-            edge_set subset = set.get_random_subset();
+            edge_set subset = edges.get_random_subset();
 
             THEN("the resulting set is a proper subset") {
-                bool isSubset = true;
-                for_each(subset.edges.begin(), subset.edges.end(), [&] (const edge& e) {
-                    isSubset = isSubset && set.contains(e);
-                });
-
-                REQUIRE(isSubset == true);
-                REQUIRE(set.edges.size() != subset.edges.size());
-                REQUIRE(subset.edges.size() != 0);
+                REQUIRE(edges.is_sub_set(subset) == true);
             }
         }
     }
 } 
+
+SCENARIO("Manipulating edges and verticies") {
+    GIVEN("5 verticies {1,2,3,4,5}, and two edges {2-3, 4-5}") {
+        edge_set set;
+        set.add(1).add(2,3).add(4,5);
+
+        WHEN("a duplicate vertex is added") {
+            set.add(3);
+
+            THEN("there are 5 verticies") {
+                REQUIRE(set.size_verticies() == 5);
+            }
+
+            THEN("there are 2 edges") {
+                REQUIRE(set.size_edges() == 2);
+            }
+
+            THEN("vetex 1 has degree of 0") {
+                REQUIRE(set.degree(1) == 0);
+            }
+
+            THEN("vetex 2 has degree of 1") {
+                REQUIRE(set.degree(2) == 1);
+            }
+            
+            THEN("vetex 3 has degree of 1") {
+                REQUIRE(set.degree(3) == 1);
+            }
+            
+            THEN("vetex 4 has degree of 0") {
+                REQUIRE(set.degree(4) == 1);
+            }
+
+            THEN("vetex 5 has degree of 0") {
+                REQUIRE(set.degree(5) == 1);
+            }
+        }
+
+        WHEN("a duplicate edge is added") {
+            set.add(2,3);
+
+            THEN("there are 5 verticies") {
+                REQUIRE(set.size_verticies() == 5);
+            }
+
+            THEN("there are 2 edges") {
+                REQUIRE(set.size_edges() == 2);
+            }
+
+            THEN("vetex 1 has degree of 0") {
+                REQUIRE(set.degree(1) == 0);
+            }
+
+            THEN("vetex 2 has degree of 1") {
+                REQUIRE(set.degree(2) == 1);
+            }
+            
+            THEN("vetex 3 has degree of 1") {
+                REQUIRE(set.degree(3) == 1);
+            }
+            
+            THEN("vetex 4 has degree of 0") {
+                REQUIRE(set.degree(4) == 1);
+            }
+
+            THEN("vetex 5 has degree of 0") {
+                REQUIRE(set.degree(5) == 1);
+            }
+        }
+
+        WHEN("a non existant vertex is removed") {
+            set.remove(10);
+            
+            THEN("there are 5 verticies") {
+                REQUIRE(set.size_verticies() == 5);
+            }
+
+            THEN("there are 2 edges") {
+                REQUIRE(set.size_edges() == 2);
+            }
+
+            THEN("vetex 1 has degree of 0") {
+                REQUIRE(set.degree(1) == 0);
+            }
+
+            THEN("vetex 2 has degree of 1") {
+                REQUIRE(set.degree(2) == 1);
+            }
+            
+            THEN("vetex 3 has degree of 1") {
+                REQUIRE(set.degree(3) == 1);
+            }
+            
+            THEN("vetex 4 has degree of 0") {
+                REQUIRE(set.degree(4) == 1);
+            }
+
+            THEN("vetex 5 has degree of 0") {
+                REQUIRE(set.degree(5) == 1);
+            }
+        }
+
+        WHEN("a non existant edge is removed") {
+            set.remove(9,10);
+
+            THEN("there are 5 verticies") {
+                REQUIRE(set.size_verticies() == 5);
+            }
+
+            THEN("there are 2 edges") {
+                REQUIRE(set.size_edges() == 2);
+            }
+
+            THEN("vetex 1 has degree of 0") {
+                REQUIRE(set.degree(1) == 0);
+            }
+
+            THEN("vetex 2 has degree of 1") {
+                REQUIRE(set.degree(2) == 1);
+            }
+            
+            THEN("vetex 3 has degree of 1") {
+                REQUIRE(set.degree(3) == 1);
+            }
+            
+            THEN("vetex 4 has degree of 0") {
+                REQUIRE(set.degree(4) == 1);
+            }
+
+            THEN("vetex 5 has degree of 0") {
+                REQUIRE(set.degree(5) == 1);
+            }
+        }
+
+        WHEN("the verticies are added") {
+            THEN("there are 5 verticies") {
+                REQUIRE(set.size_verticies() == 5);
+            }
+
+            THEN("there are 2 edges") {
+                REQUIRE(set.size_edges() == 2);
+            }
+
+            THEN("vetex 1 has degree of 0") {
+                REQUIRE(set.degree(1) == 0);
+            }
+
+            THEN("vetex 2 has degree of 1") {
+                REQUIRE(set.degree(2) == 1);
+            }
+            
+            THEN("vetex 3 has degree of 1") {
+                REQUIRE(set.degree(3) == 1);
+            }
+            
+            THEN("vetex 4 has degree of 0") {
+                REQUIRE(set.degree(4) == 1);
+            }
+
+            THEN("vetex 5 has degree of 0") {
+                REQUIRE(set.degree(5) == 1);
+            }
+        }
+        
+        WHEN("vertex 1 is removed") {
+            set.remove(1);
+
+            THEN("there are 4 verticies") {
+                REQUIRE(set.size_verticies() == 4);
+            }
+            
+            THEN("vertex 1 is not in the set") {
+                REQUIRE(set.contains(1) == false);
+            }
+            
+            THEN("vertex 2 is in the set") {
+                REQUIRE(set.contains(2) == true);
+            }
+
+            THEN("vertex 3 is in the set") {
+                REQUIRE(set.contains(3) == true);
+            }
+            
+            THEN("vertex 4 is in the set") {
+                REQUIRE(set.contains(4) == true);
+            }
+
+            THEN("vertex 5 is in the set") {
+                REQUIRE(set.contains(5) == true);
+            }
+        }
+    }
+    GIVEN("An edge 1 - 2 and an empty set") {
+        edge_set edges;
+
+        WHEN("the edge is added") {
+            edges.add(1,2);
+
+            THEN("there is one edge in the set") {
+                REQUIRE(edges.size_edges() == 1);
+            }
+
+            THEN("this are 2 verticies") {
+                REQUIRE(edges.size_verticies() == 2);
+            }
+
+            THEN("the set has 1-2") {
+                REQUIRE(edges.contains(1,2) == true);
+            }
+
+            THEN("1 has one neighbor") {
+                REQUIRE(edges.degree(1) == 1);
+            }
+            
+            THEN("2 has one neighbor") {
+                REQUIRE(edges.degree(2) == 1);
+            }
+        }
+    }
+
+    GIVEN("An edge set with 1-2 and 2-3") {
+        edge_set edges;
+        edges.add(1,2).add(2,3);
+
+        WHEN("the edges are added") {
+            THEN("there are two edges in the set") {
+                REQUIRE(edges.size_edges() == 2);
+            }
+
+            THEN("this are 3 verticies") {
+                REQUIRE(edges.size_verticies() == 3);
+            }
+            
+            THEN("the set has 1-2") {
+                REQUIRE(edges.contains(1,2) == true);
+            }
+
+            THEN("the set has 2-3") {
+                REQUIRE(edges.contains(2,3) == true);
+            }
+
+            THEN("the set has 2-1") {
+                REQUIRE(edges.contains(2,1) == true);
+            }
+
+            THEN("the set has 3-2") {
+                REQUIRE(edges.contains(3,2) == true);
+            }
+
+            THEN("1 has one neighbor") {
+                REQUIRE(edges.degree(1) == 1);
+            }
+
+            THEN("2 has one neighbor") {
+                REQUIRE(edges.degree(2) == 2);
+            }
+            
+            THEN("3 has one neighbor") {
+                REQUIRE(edges.degree(3) == 1);
+            }
+        }
+
+        WHEN("2-3 is removed") {
+           edges.remove(2,3);
+
+            THEN("there is only one edge in the set") {
+                REQUIRE(edges.size_edges() == 1);
+            }
+
+            THEN("there are 3 verticies") {
+                REQUIRE(edges.size_verticies() == 3);
+            }
+            
+            THEN("the set has 1-2") {
+                REQUIRE(edges.contains(1,2) == true);
+            }
+
+            THEN("the set does not have 2-3") {
+                REQUIRE(edges.contains(2,3) == false);
+            }
+
+            THEN("1 has one neighbor") {
+                REQUIRE(edges.degree(1) == 1);
+            }
+
+            THEN("2 has one neighbor") {
+                REQUIRE(edges.degree(2) == 1);
+            }
+            
+            THEN("3 has no neighbors") {
+                REQUIRE(edges.degree(3) == 0);
+            }
+        } 
+    }
+}

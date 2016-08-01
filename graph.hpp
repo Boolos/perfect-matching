@@ -29,7 +29,7 @@ namespace csce {
         bool is_perfect_matching(const edge_set& possible_matching) const;
 		bool is_sparse() const;
         bool has_edges() const;
-        edge_set get_redundant() const;
+        edge_set get_redundant();
         edge_set get_matches() const;
         int get_rank(const edge_set& s ) const;
 	};

@@ -5,7 +5,6 @@
 
 using namespace csce;
 using namespace std;
-
 /*
 SCENARIO("Constructing a graph") {
     GIVEN("A set of edges") {

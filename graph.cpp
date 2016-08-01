@@ -56,7 +56,7 @@ edge_set graph::find_matching() const {
     return matching;
 }
 
-edge_set graph::get_redundant() const {
+edge_set graph::get_redundant() {
     edge_set redundant;
     // get random subset S of E
     edge_set s = this->edges.get_random_subset();
