@@ -6,9 +6,11 @@
 #include <unordered_map>
 #include <string>
 #include <sstream>
+#include <algorithm>
 #include <random>
 #include "math.h"
-#include "edge_set.hpp"
+#include "graph.hpp"
+#include "edge.hpp"
 #include "polynomial.hpp"
 #include <iostream>
 
@@ -16,7 +18,7 @@ namespace csce {
 	class matrix {
 	public:
         matrix();
-		matrix(csce::edge_set e, csce::edge_set s);
+		matrix(const csce::Graph& e, const csce::Graph& s);
 		csce::polynomial determinant();
 		void replace_indeterminates(int edge_count);
 		

@@ -1,7 +1,4 @@
 #include "catch.hpp"
-#include "edge_set.hpp"
-#include "vertex.hpp"
-#include "edge.hpp"
 #include "matrix.hpp"
 #include "polynomial.hpp"
 

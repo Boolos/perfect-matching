@@ -28,7 +28,7 @@ SCENARIO("Polynomial operations") {
 			csce::polynomial result = pa + pb;
 
 			THEN("they are summed correctly") {
-				REQUIRE(result.str() == "4(x^2)(y^3) + 3(x^3)(y^3) + 5(y^3)");
+				REQUIRE(result.str() == "4(x^2)(y^3) + 5(y^3) + 3(x^3)(y^3)");
 			}
 		}
 
@@ -36,7 +36,7 @@ SCENARIO("Polynomial operations") {
 			csce::polynomial result = pa - pb;
 
 			THEN("they are subtracted correctly") {
-				REQUIRE(result.str() == "-4(x^2)(y^3) + 3(x^3)(y^3) + 5(y^3)");
+				REQUIRE(result.str() == "-4(x^2)(y^3) + 5(y^3) + 3(x^3)(y^3)");
 			}
 		}
 

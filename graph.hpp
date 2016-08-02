@@ -2,36 +2,85 @@
 #define UARK_CSCE_GRAPH_HEADER
 
 #include <vector>
+#include <stdexcept>
 #include <unordered_set>
-#include "math.h"
-#include "edge_set.hpp"
-#include "matrix.hpp"
-#include "vertex.hpp"
-#include "polynomial.hpp"
 #include <iostream>
+#include "vertex.hpp"
+#include "edge.hpp"
+
+using namespace std;
 
 namespace csce {
-	class graph {
+	class Graph {
 	public:
-        graph();
-		graph(const edge_set& set);
+        Graph();
 
-        edge_set edges;
-        std::unordered_set<vertex, vertex_hash> verticies;
-        std::unordered_map<int, vertex> vs;
+		Graph &add(size_t id);
+		Graph &add(const Vertex& vertex);
+		Graph &add(size_t uId, size_t vId);
+		Graph &add(const Vertex& u, const Vertex& v);
+		Graph &add(const Edge& edge);
 
-		edge_set find_perfect_matching() const;
-        void remove_edges(const edge_set& edges_to_remove);
-        void remove_verticies(const std::unordered_set<vertex, vertex_hash>& verticies_to_remove);
-		
+        bool contains(size_t id) const;
+        bool contains(const Vertex& vertex) const;
+        bool contains(size_t uId, size_t vId) const;
+		bool contains(const Vertex& u, const Vertex& v) const;
+        bool contains(const Edge& edge) const;
+
+        Graph difference(const Graph& other) const;
+
+        Edge getEdge(size_t uId, size_t vId) const;
+        Edge getEdge(const Vertex& u, const Vertex& v) const;
+        Edge getEdge(const Edge& edge) const;
+        size_t getEdgeCount() const;
+        vector<Edge> getEdges() const;
+        vector<Edge> getEdges(size_t id) const;
+        vector<Edge> getEdges(const Vertex& incident) const;
+
+        Vertex getVertex(size_t id) const;
+        Vertex getVertex(const Vertex& vertex) const;
+        size_t getVertexCount() const;
+        vector<Vertex> getVerticies() const;
+        
+        bool isSubGraph(const Graph& graph) const;
+
+		Graph &remove(size_t id);
+		Graph &remove(const Vertex& vertex);
+		Graph &remove(size_t uId, size_t vId);
+		Graph &remove(const Vertex& u, const Vertex& v);
+		Graph &remove(const Edge& edge);
+
+        Graph unionSet(const Graph& other) const;
+
+		bool operator ==(const Graph& other) const {
+            if (this->getVertexCount() != other.getVertexCount()) {
+                return false;
+            }
+            if (this->getEdgeCount() != other.getEdgeCount()) {
+                return false;
+            }
+
+            // dumb search (implement sorted comparison later)
+            for (auto vertex = _verticies.begin(); vertex != _verticies.end(); vertex++) {
+                if (!other.contains(*vertex)) {
+                    return false;
+                }
+            }
+            
+            auto edges = this->getEdges();
+            for (auto edge = edges.begin(); edge != edges.end(); edge++) {
+                if (!other.contains(*edge)) {
+                    return false;
+                }
+            }
+
+            return true;
+		}
+        
 	private:
-        edge_set find_matching() const;
-        bool is_perfect_matching(const edge_set& possible_matching) const;
-		bool is_sparse() const;
-        bool has_edges() const;
-        edge_set get_redundant();
-        edge_set get_matches() const;
-        int get_rank(const edge_set& s ) const;
+        vector<Vertex> _verticies;
+        vector<Vertex>::iterator _findVertex(const Vertex& vertex);
+        vector<Vertex>::const_iterator _findVertex(const Vertex& vertex) const;
 	};
 }
 

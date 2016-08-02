@@ -2,20 +2,18 @@
 
 csce::matrix::matrix() { }
 
-csce::matrix::matrix(csce::edge_set e, csce::edge_set s) {
+csce::matrix::matrix(const csce::Graph& e, const csce::Graph& s) {
 	this->mat.clear();
 	int max = std::numeric_limits<int>::min();
-	for(auto& it : e.edges){
-		max = std::max(max, it.u.id);
-		max = std::max(max, it.v.id);
+	for(auto& it : e.getEdges()){
+		max = std::max(max, (int)it.getU().getId());
+		max = std::max(max, (int)it.getV().getId());
 	}
 	
 	for(int u=0; u<max; u++){
 		std::vector<csce::polynomial> row;
 		for(int v=0; v<max; v++){
-            csce::vertex vertex_u(u+1);
-            csce::vertex vertex_v(v+1);
-			csce::edge cur(vertex_u, vertex_v);
+			csce::Edge cur(u+1, v+1);
 			if(s.contains(cur)){ //if {u, v} is in S
 				csce::polynomial p;
 				p.terms[{{'x', 1}, {'y', 1}}] = 1.0L;

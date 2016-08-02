@@ -1,33 +1,57 @@
 #include "vertex.hpp"
 
 using namespace csce;
+using namespace std;
 
-vertex::vertex(int _id) : id(_id) { }
+Vertex::Vertex(size_t id) : _id(id) { }
 
-void vertex::add_neighbor(const vertex& neighbor) {
-    this->neighbors.push_back(neighbor);
+Vertex &Vertex::addNeighbor(size_t id) {
+    return this->addNeighbor(Vertex(id));
 }
 
-void vertex::remove_neighbor(const vertex& neighbor) {
-    int index = -1;
-    for (int i = 0; i < this->neighbors.size(); i++) {
-        if (this->neighbors[i].id == neighbor.id) {
-            index = i;
+Vertex &Vertex::addNeighbor(const Vertex& vertex) {
+    this->_neighbors.push_back(vertex);
+    return *this;
+}
+
+size_t Vertex::getDegree() const {
+    return this->_neighbors.size();
+}
+
+size_t Vertex::getId() const {
+    return this->_id;
+}
+
+list<Vertex> Vertex::getNeighbors() const {
+    return this->_neighbors;
+}
+
+bool Vertex::hasNeighbor(size_t id) const {
+    return this->hasNeighbor(Vertex(id));
+}
+
+bool Vertex::hasNeighbor(const Vertex& vertex) const {
+    auto neighbor = this->_neighbors.begin();
+    for (neighbor; neighbor != this->_neighbors.end(); neighbor++) {
+        if (*neighbor == vertex) {
             break;
         }
     }
-    if (index >= 0) {
-        this->neighbors.erase(this->neighbors.begin() + index);
-    }
+    return neighbor != this->_neighbors.end();
+} 
+
+Vertex &Vertex::removeNeighbor(size_t id) {
+    this->removeNeighbor(Vertex(id));
+    return *this;
 }
 
-void vertex::destroy() {
-    for (int i = 0; i < this->neighbors.size(); i++) {
-        this->neighbors[i].remove_neighbor(*this);
-    }
+Vertex &Vertex::removeNeighbor(const Vertex& vertex) {
+    this->_neighbors.remove(vertex);
+    return *this;
 }
 
-int vertex::degree() const {
-    return this->neighbors.size();
+string Vertex::str() const {
+    ostringstream oss;
+    oss << this->_id;
+    return oss.str();
 }
-

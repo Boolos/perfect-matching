@@ -1,7 +1,4 @@
 #include "catch.hpp"
-#include "edge_set.hpp"
-#include "edge.hpp"
-#include "vertex.hpp"
 #include "solution.hpp"
 #include <string>
 

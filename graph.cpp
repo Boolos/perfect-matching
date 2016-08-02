@@ -3,162 +3,251 @@
 using namespace csce;
 using namespace std;
 
-graph::graph() { }
+Graph::Graph() { }
 
-graph::graph(const edge_set& set) {
-    for_each(set.edges.begin(), set.edges.end(), [&] (const edge& e) {
-        this->edges.add(e);
-        this->verticies.insert(e.u);
-        this->verticies.insert(e.v);
-    });
+Graph &Graph::add(size_t id) {
+    return this->add(Vertex(id));
 }
 
-edge_set graph::find_perfect_matching() const {
-    edge_set matching;
-    
-    do {
-        cout << "======== Finding Perfect Matching ========" << endl;
-        matching = this->find_matching();
-    } while (!this->is_perfect_matching(matching));
-    
-	return matching;
-}
-
-edge_set graph::find_matching() const {
-    graph working_copy = graph(this->edges);
-    edge_set matching;
-    int cap = 0;
-
-    while (cap++ < 10 && working_copy.has_edges()) {
-        cout << "Working copy has " << working_copy.edges.edges.size() << " edges and " << working_copy.verticies.size() << " verticies" << endl;
-        for (auto it = working_copy.verticies.begin(); it != working_copy.verticies.end(); it++) {
-            cout << "Vertex: " << it->id << " has " << it->degree() << " neighbors" << endl;
-        }
-        if (working_copy.is_sparse()) {
-            cout << "Working copy is sparse" << endl;
-            edge_set matched_edges = working_copy.get_matches();
-            cout << matched_edges.edges.size() << " matching edges found in working copy" << endl;
-            matching = matching.union_set(matched_edges);
-            cout << "Current matching has " << matching.edges.size() << " edges" << endl;
-            cout << "Working copy had " << working_copy.edges.edges.size() << " edges ";
-            working_copy.remove_verticies(matched_edges.get_verticies());
-            cout << "and now has " << working_copy.edges.edges.size() << " edges and " << working_copy.verticies.size() << " verticies" << endl;
-        } else {
-            cout << "Working copy is not sparse" << endl;
-            edge_set redundant = working_copy.get_redundant();
-            cout << "Found " << redundant.edges.size() << " redundant edges." << endl;
-            working_copy.remove_edges(redundant);
-            cout << "Working copy now has " << working_copy.edges.edges.size() << " edges in it." << endl;
-        }
-        cout << "-----------------------" << endl;
+Graph &Graph::add(const Vertex& vertex) {
+    auto it = this->_findVertex(vertex);
+    if (it != this->_verticies.end()) {
+        return *this;
     }
 
-    return matching;
+    this->_verticies.push_back(vertex);
+    return *this;
 }
 
-edge_set graph::get_redundant() {
-    edge_set redundant;
-    // get random subset S of E
-    edge_set s = this->edges.get_random_subset();
-
-    // foreach e in E - S, if Rank(S u e) == Rank(S) => add E to RE
-    edge_set diff = this->edges.difference(s);
-    for_each(diff.edges.begin(), diff.edges.end(), [&] (const edge& e) {
-        edge_set temp;
-        temp.add(e);
-        if (this->get_rank(s.union_set(temp)) == this->get_rank(s)) {
-            redundant.add(e);
-        }
-    });
-
-    return redundant;
+Graph &Graph::add(size_t uId, size_t vId) {
+    return this->add(Vertex(uId), Vertex(vId));
 }
 
-int graph::get_rank(const edge_set& s) const {
-    // build matrix over E and S
-    matrix b(this->edges, s);
-
-    // replace indeterminate
-    b.replace_indeterminates(this->edges.edges.size());
-
-    // get max degree
-    return b.determinant().degree();
+Graph &Graph::add(const Vertex& u, const Vertex& v) {
+    return this->add(Edge(u, v));
 }
 
-edge_set graph::get_matches() const {
-    edge_set matches;
-
-    for_each(this->edges.edges.begin(), this->edges.edges.end(), [&] (const edge& edge) {
-        // TODO START HERE: it looks like the vertex removal isn't working
-        if (edge.is_incident_with_degree(1)) {
-            matches.add(edge);
-        }
-    });
-
-    return matches;
-}
-
-void graph::remove_edges(const edge_set& edges_to_remove) {
-    vector<edge> etr;
-    for (auto it = edges_to_remove.edges.begin(); it != edges_to_remove.edges.end(); it++) {
-        auto re = this->edges.edges.find(*it);
-        if (re != this->edges.edges.end()) {
-            etr.push_back(*re);
-        }
-    }
-    this->edges = this->edges.difference(edges_to_remove);
-    cout << etr.size() << endl;
-    for (int i = 0; i < etr.size(); i++) {
-        this->edges.edges.erase(etr[i]);
-        cout << etr[i].u.degree() << " / " << etr[i].v.degree() << endl;
-        etr[i].u.remove_neighbor(etr[i].v);
-        etr[i].v.remove_neighbor(etr[i].u);
-        cout << etr[i].u.degree() << " / " << etr[i].v.degree() << endl;
-        this->edges.edges.insert(etr[i]);
+Graph &Graph::add(const Edge& edge) {
+    if (this->contains(edge)) {
+        return *this;
     }
 
-    
+    auto itU = this->_findVertex(edge.getU());
+    if (itU != this->_verticies.end()) {
+        itU->addNeighbor(edge.getV());
+    } else {
+        auto u = edge.getU();
+        u.addNeighbor(edge.getV());
+        this->_verticies.push_back(u);
+    }
+
+    auto itV = this->_findVertex(edge.getV());
+    if (itV != this->_verticies.end()) {
+        itV->addNeighbor(edge.getU());
+    } else {
+        auto v = edge.getV();
+        v.addNeighbor(edge.getU());
+        this->_verticies.push_back(v);
+    }
+
+    return *this;
 }
 
-void graph::remove_verticies(const unordered_set<vertex, vertex_hash>& verticies_to_remove) {
-    edge_set edges_to_remove;
-    vector<vertex> v_to_remove;
+bool Graph::contains(size_t id) const {
+    return this->contains(Vertex(id));
+}
 
-    for_each(verticies_to_remove.begin(), verticies_to_remove.end(), [&] (const vertex& vertex) {
-        v_to_remove.push_back(vertex);
+bool Graph::contains(const Vertex& vertex) const {
+    try {
+        this->getVertex(vertex);
+        return true;
+    } catch (const logic_error& e) {
+        return false;
+    }
+}
 
-        for_each(this->edges.edges.begin(), this->edges.edges.end(), [&] (const edge& edge) {
-            if (edge.u.id == vertex.id || edge.v.id == vertex.id) {
-                edges_to_remove.add(edge);
+bool Graph::contains(size_t uId, size_t vId) const {
+    return this->contains(Vertex(uId), Vertex(vId));
+}
+
+bool Graph::contains(const Vertex& u, const Vertex& v) const {
+    return this->contains(Edge(u, v));
+}
+
+bool Graph::contains(const Edge& edge) const {
+    try {
+        this->getEdge(edge);
+        return true;
+    } catch (const logic_error& e) {
+        return false;
+    }
+}
+
+Edge Graph::getEdge(size_t uId, size_t vId) const {
+    return this->getEdge(Vertex(uId), Vertex(vId));
+}
+
+Edge Graph::getEdge(const Vertex& u, const Vertex& v) const {
+    return this->getEdge(Edge(u, v));
+}
+
+Edge Graph::getEdge(const Edge& edge) const {
+    for (auto vertex = _verticies.begin(); vertex != _verticies.end(); vertex++) {
+        auto neighbors = vertex->getNeighbors();
+        for (auto neighbor = neighbors.begin(); neighbor != neighbors.end(); neighbor++) {
+            Edge e(Vertex(vertex->getId()), Vertex(neighbor->getId()));
+
+            if (edge == e) {
+                return e;
             }
-        });
-    });
+        }
+    }
+    throw logic_error("Edge does not exist");
+}
 
+size_t Graph::getEdgeCount() const {
+    size_t count = 0;
+    for (auto vertex = this->_verticies.begin(); vertex != this->_verticies.end(); vertex++) {
+        count += vertex->getDegree();
+    }
+    return count / 2;
+
+}
+
+vector<Edge> Graph::getEdges() const {
+    unordered_set<string> distinctEdges;
+    vector<Edge> edges;
+
+    for (auto vertex = _verticies.begin(); vertex != _verticies.end(); vertex++) {
+        auto neighbors = vertex->getNeighbors();
+        for (auto neighbor = neighbors.begin(); neighbor != neighbors.end(); neighbor++) {
+            Edge e(Vertex(vertex->getId()), Vertex(neighbor->getId()));
+
+            if (distinctEdges.count(e.str()) > 0) {
+                continue;
+            }
+
+            distinctEdges.insert(e.str());
+            edges.push_back(e);
+        }
+    }
     
-    for (int i = 0; i < v_to_remove.size(); i++) {
-        v_to_remove[i].destroy();
-        this->verticies.erase(v_to_remove[i]);
-        this->verticies.insert(v_to_remove[i]);
-    } 
-    //this->verticies.erase(vertex);
-
-
-    this->edges = this->edges.difference(edges_to_remove);
+    return edges;
 }
 
-bool graph::is_sparse() const {
-    int sparse = floor(int(3.0 / 4 * this->verticies.size()));
-	return this->edges.edges.size() < sparse;
+
+vector<Edge> Graph::getEdges(size_t id) const {
+    return this->getEdges(Vertex(id));
 }
 
-bool graph::has_edges() const {
-    return this->edges.edges.size() > 0;
-}
+vector<Edge> Graph::getEdges(const Vertex& incident) const {
+    vector<Edge> edges;
 
-bool graph::is_perfect_matching(const edge_set& possible_matching) const {
-    int edges_in_matching_count = possible_matching.edges.size();
-    int verticies_in_graph_count = this->verticies.size();
-    int half_the_number_of_verticies = floor(int(verticies_in_graph_count / 2.0));
+    auto vertex = this->_findVertex(incident);
+    if (vertex == this->_verticies.end()) {
+        return edges;
+    }
+
+    auto neighbors = vertex->getNeighbors();
+    for (auto neighbor = neighbors.begin(); neighbor != neighbors.end(); neighbor++) {
+        Edge e(vertex->getId(), neighbor->getId());
+        edges.push_back(e);
+    }
     
-    return edges_in_matching_count <= half_the_number_of_verticies;
+    return edges;
+}
+
+Vertex Graph::getVertex(size_t id) const {
+    return this->getVertex(Vertex(id));
+}
+
+Vertex Graph::getVertex(const Vertex& vertex) const {
+    auto v = this->_findVertex(vertex);
+    
+    if (v != this->_verticies.end()) {
+        return *v;
+    } else {
+        throw logic_error("Vertex does not exist");
+    }
+}
+
+size_t Graph::getVertexCount() const {
+    return this->_verticies.size();
+}
+
+vector<Vertex> Graph::getVerticies() const {
+    return this->_verticies;
+}
+
+bool Graph::isSubGraph(const Graph& graph) const {
+    auto edges = graph.getEdges();
+    for (auto edge = edges.begin(); edge != edges.end(); edge++) {
+        if (!this->contains(*edge)) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+Graph &Graph::remove(size_t id) {
+    return this->remove(Vertex(id));
+}
+
+Graph &Graph::remove(const Vertex& vertex) {
+    auto v = this->_findVertex(vertex);
+    if (v == this->_verticies.end()) {
+        return *this;
+    }
+
+    auto neighbors = v->getNeighbors();
+    for (auto neighbor = neighbors.begin(); neighbor != neighbors.end(); neighbor++) {
+        v->removeNeighbor(*neighbor);
+    }
+
+    this->_verticies.erase(v);
+    
+    return *this;
+}
+
+Graph &Graph::remove(size_t uId, size_t vId) {
+    return this->remove(Vertex(uId), Vertex(vId));
+}
+
+Graph &Graph::remove(const Vertex& u, const Vertex& v) {
+    return this->remove(Edge(u, v));
+}
+
+Graph &Graph::remove(const Edge& edge) {
+    auto u = this->_findVertex(edge.getU());
+    if (u == this->_verticies.end()) {
+        return *this;
+    }
+    u->removeNeighbor(edge.getV());
+
+    auto v = this->_findVertex(edge.getV());
+    if (v == this->_verticies.end()) {
+        return *this;
+    }
+    v->removeNeighbor(edge.getU());
+    
+    return *this;
+}
+
+vector<Vertex>::iterator Graph::_findVertex(const Vertex& vertex) {
+    for (auto it = this->_verticies.begin(); it != this->_verticies.end(); it++) {
+        if (*it == vertex) {
+            return it;
+        }
+    }
+    return this->_verticies.end();
+}
+
+vector<Vertex>::const_iterator Graph::_findVertex(const Vertex& vertex) const {
+    for (auto it = this->_verticies.cbegin(); it != this->_verticies.cend(); it++) {
+        if (*it == vertex) {
+            return it;
+        }
+    }
+    return this->_verticies.cend();
 }

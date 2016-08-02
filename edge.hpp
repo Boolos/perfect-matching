@@ -2,28 +2,27 @@
 #define UARK_CSCE_EDGE_HEADER
 
 #include "vertex.hpp"
-#include <algorithm>
+#include <string>
+#include <sstream>
+
+using namespace std;
 
 namespace csce {
-	class edge {
+	class Edge {
 	public:
-		vertex u;
-		vertex v;
-		edge(const vertex& _u, const vertex& _v);
-        bool is_incident_with_degree(int degree) const;
-		
-		bool operator ==(const csce::edge& other) const {
-			return std::min(u, v) == std::min(other.u, other.v) && std::max(u, v) == std::max(other.u, other.v);
+        Edge(size_t uId, size_t vId);
+        Edge(Vertex u, Vertex v);
+
+        Vertex getU() const;
+        Vertex getV() const;
+        string str() const;
+
+		bool operator ==(const Edge& other) const {
+            return this->str() == other.str();
 		}
-		
 	private:
-		
-	};
-	
-	struct edge_hash {
-		std::size_t operator()(const csce::edge& e ) const {
-			return std::hash<int>()(e.u.id) ^ std::hash<int>()(e.v.id);
-		}
+        Vertex _u;
+        Vertex _v;
 	};
 }
 

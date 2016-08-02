@@ -1,5 +1,6 @@
 #include "solution.hpp"
 
+/*
 csce::solution::solution(edge_set &edgeset, std::string f) {
 	std::ifstream infile(f.c_str());
 
@@ -44,3 +45,4 @@ bool csce::solution::isSolution(edge_set e) {
 	}
 	return true;
 }
+*/

@@ -1,11 +1,24 @@
 #include "edge.hpp"
-#include <iostream>
 
 using namespace csce;
+using namespace std;
 
-edge::edge(const vertex& _u, const vertex& _v) : u(_u), v(_v) { }
+Edge::Edge(size_t uId, size_t vId) : _u(Vertex(uId)), _v(Vertex(vId)) { }
 
-bool edge::is_incident_with_degree(int degree) const {
-    //std::cout << this->u.degree() << " - " << this->v.degree() << std::endl;
-    return degree == this->u.degree() || degree == this->v.degree();
+Edge::Edge(Vertex u, Vertex v) : _u(u), _v(v) { }
+
+Vertex Edge::getU() const {
+    return this->_u;
+}
+
+Vertex Edge::getV() const {
+    return this->_v;
+}
+
+string Edge::str() const {
+    auto first = _u.getId() > _v.getId() ? _u.getId() : _v.getId();
+    auto second = first == _u.getId() ? _v.getId() : _u.getId();
+    ostringstream oss;
+    oss << first << "-" << second;
+    return oss.str();
 }

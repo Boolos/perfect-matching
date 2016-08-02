@@ -1,25 +1,18 @@
-CPP=clang++
-CPPFLAGS=-Wall -std=c++11 -stdlib=libc++
+CPP=g++-5
+CPPFLAGS=-std=c++11 -fopenmp
 RM=rm -f
-SRCS=edge.cpp edge_set.cpp graph.cpp matrix.cpp polynomial.cpp solution.cpp vertex.cpp
-TEST_SRCS=tests.cpp polynomial_tests.cpp edge_tests.cpp edge_set_tests.cpp matrix_tests.cpp graph_tests.cpp solution_tests.cpp
+SRCS=edge.cpp graph.cpp matrix.cpp perfect-matching.cpp polynomial.cpp solution.cpp vertex.cpp
+TEST_SRCS=tests.cpp polynomial_tests.cpp matrix_tests.cpp graph-tests.cpp solution_tests.cpp
 OBJS=$(subst .cpp,.o,$(SRCS))
 
 all: app
 
 tests: 
-	$(CPP) $(CPPFLAGS) $(SRCS) $(TEST_SRCS) -o tests.out
+	g++-5 $(CPPFLAGS) $(SRCS) $(TEST_SRCS) -o tests.out
 
 app: $(OBJS)
-	$(CPP) $(CPPFLAGS) main.cpp -o app.out $(OBJS)
-
-depend: .depend
-
-.depend: $(SRCS)
-	rm -f ./.depend
-	$(CPP) $(CPPFLAGS) -MM $^>>./.depend;
+	g++-5 $(CPPFLAGS) main.cpp -o app.out $(OBJS)
 
 clean:
 	$(RM) $(OBJS)
 
-include .depend
