@@ -9,25 +9,41 @@ csce::matrix::matrix(const csce::Graph& e, const csce::Graph& s) {
 		max = std::max(max, (int)it.getU().getId());
 		max = std::max(max, (int)it.getV().getId());
 	}
-	
-	for(int u=0; u<max; u++){
+
+    auto eLessS = e.difference(s);
+    auto eVerticies = e.getVerticies();
+
+    // Requires that bipartite graph starts at 0 and contains no gaps
+    auto n = e.getVertexCount() / 2;
+    for (int u = 0; u < n; u++) {
 		std::vector<csce::polynomial> row;
-		for(int v=0; v<max; v++){
-			csce::Edge cur(u+1, v+1);
-			if(s.contains(cur)){ //if {u, v} is in S
-				csce::polynomial p;
-				p.terms[{{'x', 1}, {'y', 1}}] = 1.0L;
-				row.push_back(p);
-			} else if(e.contains(cur)){ //if {u, v} is in E - S
-				csce::polynomial p;
-				p.terms[{{'x', 1}}] = 1.0L;
-				row.push_back(p);
-			} else { //if {u, v} is not in E
-				row.push_back(csce::polynomial::value_of(0.0L));
-			}
-		}
-		mat.push_back(row);
-	}
+        for (int v = n; v < n * 2; v++) {
+            csce::Edge cur(u, v);
+            //std::cout << cur.str() << ": ";
+            if(s.contains(cur)){ //if {u, v} is in S
+                csce::polynomial p;
+                p.terms[{{'x', 1}, {'y', 1}}] = 1.0L;
+                row.push_back(p);
+                
+                //std::cout << p.str() << " | ";
+
+            } else if(eLessS.contains(cur)){ //if {u, v} is in E - S
+                csce::polynomial p;
+                p.terms[{{'x', 1}}] = 1.0L;
+                row.push_back(p);
+
+                //std::cout << p.str() << "  | ";
+
+            } else { //if {u, v} is not in E
+                auto p = csce::polynomial::value_of(0.0L);
+                row.push_back(p);
+                
+                //std::cout << "0" << "  | ";
+            }
+        }
+        mat.push_back(row);
+        //std::cout << std::endl;
+    }
 }
 
 csce::polynomial csce::matrix::determinant() {
@@ -54,7 +70,7 @@ csce::polynomial csce::matrix::determinant(const std::vector< std::vector< csce:
 			det = det - matrix[0][x] * csce::matrix::determinant(csce::matrix::submatrix(matrix, x));
 		}
 	}
-	
+
 	return det;
 }
 
@@ -76,14 +92,14 @@ std::vector< std::vector<csce::polynomial> > csce::matrix::submatrix(const std::
 
 void csce::matrix::replace_indeterminates(int edge_count) {
     // for each term, if x, replace with random number;
-    //std::cout << "ENTER" << std::endl;
+    //std::cout << "Replacing indeterminates..." << std::endl;
     for (int row = 0; row < this->mat.size(); row++) {
-        //std::cout << "Row " << row << ": ";
         for (int col = 0; col < this->mat[row].size(); col++) {
             auto p = this->mat[row][col].replace('x', this->get_random_number(edge_count));
             this->mat[row][col] = p;
-            //std::cout << this->mat[row][col].str() << std::endl;
+            //std::cout << this->mat[row][col].str() << " | ";
         }
+        //std::cout << std::endl;
     }
 
 }

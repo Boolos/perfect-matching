@@ -16,7 +16,7 @@ Vertex Edge::getV() const {
 }
 
 string Edge::str() const {
-    auto first = _u.getId() > _v.getId() ? _u.getId() : _v.getId();
+    auto first = _u.getId() < _v.getId() ? _u.getId() : _v.getId();
     auto second = first == _u.getId() ? _v.getId() : _u.getId();
     ostringstream oss;
     oss << first << "-" << second;

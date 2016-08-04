@@ -2,6 +2,7 @@
 #define UARK_CSCE_PERFECT_MATCHING
 
 #include <vector>
+#include <random>
 #include "math.h"
 #include "matrix.hpp"
 #include "polynomial.hpp"
@@ -13,19 +14,22 @@ namespace csce {
 	class PerfectMatching {
 	public:
         PerfectMatching();
+        PerfectMatching(Graph& graph);
 
-		vector<Edge> findPerectMatching(Graph graph) const;
+		Graph findPerfectMatching(const Graph& graph) const;
+        Graph findMatching(Graph graph) const;
+		bool isSparse(const Graph& graph) const;
+        bool isPerfectMatching(const Graph& graph, const Graph& possibleMatching) const;
+        Graph getRedundantEdges(const Graph& graph) const;
+        Graph getObviousMatches(const Graph& graph) const;
+        int getRank(const Graph& e, const Graph& s) const;
+        Graph getRandomSubset(const Graph& graph) const;
+        size_t getRandomNumber(const Graph& graph) const;
+
+
 		
 	private:
-        vector<Edge> findMatching() const;
-        bool isPerfectMatching(const Graph& possibleMatching) const;
-		bool isSparse() const;
-        vector<Edge> getRedundantEdges();
-        vector<Edge> getMatches() const;
-        size_t getRank(const vector<Edge>& s) const;
-
-        Graph getRandomSubset();
-        int getRandomNumber() const;
+        Graph _graph;
 	};
 }
 

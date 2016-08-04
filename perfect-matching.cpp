@@ -5,44 +5,57 @@ using namespace std;
 
 PerfectMatching::PerfectMatching() {}
 
-/*
-vector<Edge> PerfectMatching::findPerfectMatching(Graph graph) const {
-    vector<Edge> matching;
+PerfectMatching::PerfectMatching(Graph& graph): _graph(graph) {}
+
+Graph PerfectMatching::findPerfectMatching(const Graph& graph) const {
+    Graph matching;
     
     do {
         cout << "======== Finding Perfect Matching ========" << endl;
-        matching = this->findMatching();
-    } while (!this->isPerfectMatching(matching));
+        matching = this->findMatching(graph);
+    } while (!this->isPerfectMatching(graph, matching));
     
+    auto edges = matching.getEdges();
+    cout << "------------ Matches ------------" << endl;
+    for (auto it = edges.begin(); it != edges.end(); it++) {
+        cout << it->str() << endl;
+    }
+
 	return matching;
 }
 
+Graph PerfectMatching::findMatching(Graph graph) const {
+    Graph matching;
 
-edge_set graph::findMatching() const {
-    graph working_copy = graph(this->edges);
-    edge_set matching;
-    int cap = 0;
+    while (graph.getEdgeCount() > 0) {
+        if (this->isSparse(graph)) {
+            cout << "Graph is sparse" << endl;
+            auto matchedEdges = this->getObviousMatches(graph);
+            auto edges = matchedEdges.getEdges();
+            for (auto it = edges.begin(); it != edges.end(); it++) {
+                Edge e(it->getU().getId(), it->getV().getId());
+                matching.add(e);
+            }
+            auto verticies = matchedEdges.getVerticies();
+            cout << "Removing " << verticies.size() << " verticies..." << endl;
+            for (auto vertex = verticies.begin(); vertex != verticies.end(); vertex++) {
+                Vertex v(vertex->getId());
+                cout << v.str() << endl;
+                graph.remove(v);
+            }
 
-    while (cap++ < 10 && working_copy.has_edges()) {
-        cout << "Working copy has " << working_copy.edges.edges.size() << " edges and " << working_copy.verticies.size() << " verticies" << endl;
-        for (auto it = working_copy.verticies.begin(); it != working_copy.verticies.end(); it++) {
-            cout << "Vertex: " << it->id << " has " << it->degree() << " neighbors" << endl;
-        }
-        if (working_copy.is_sparse()) {
-            cout << "Working copy is sparse" << endl;
-            edge_set matched_edges = working_copy.get_matches();
-            cout << matched_edges.edges.size() << " matching edges found in working copy" << endl;
-            matching = matching.union_set(matched_edges);
-            cout << "Current matching has " << matching.edges.size() << " edges" << endl;
-            cout << "Working copy had " << working_copy.edges.edges.size() << " edges ";
-            working_copy.remove_verticies(matched_edges.get_verticies());
-            cout << "and now has " << working_copy.edges.edges.size() << " edges and " << working_copy.verticies.size() << " verticies" << endl;
         } else {
-            cout << "Working copy is not sparse" << endl;
-            edge_set redundant = working_copy.get_redundant();
-            cout << "Found " << redundant.edges.size() << " redundant edges." << endl;
-            working_copy.remove_edges(redundant);
-            cout << "Working copy now has " << working_copy.edges.edges.size() << " edges in it." << endl;
+            cout << "Graph is not sparse" << endl;
+            Graph redundant = this->getRedundantEdges(graph);
+
+            auto edges = redundant.getEdges();
+            cout << "Removing " << edges.size() << " edges..." << endl;
+            for (auto edge = edges.begin(); edge != edges.end(); edge++) {
+                Edge e(edge->getU().getId(), edge->getV().getId());
+                cout << e.str() << endl;
+                graph.remove(*edge);
+            }
+
         }
         cout << "-----------------------" << endl;
     }
@@ -50,41 +63,25 @@ edge_set graph::findMatching() const {
     return matching;
 }
 
-edge_set graph::get_redundant() {
-    edge_set redundant;
-    // get random subset S of E
-    edge_set s = this->edges.get_random_subset();
-
-    // foreach e in E - S, if Rank(S u e) == Rank(S) => add E to RE
-    edge_set diff = this->edges.difference(s);
-    for_each(diff.edges.begin(), diff.edges.end(), [&] (const edge& e) {
-        edge_set temp;
-        temp.add(e);
-        if (this->get_rank(s.union_set(temp)) == this->get_rank(s)) {
-            redundant.add(e);
-        }
-    });
-
-    return redundant;
+bool PerfectMatching::isSparse(const Graph& graph) const {
+    auto sparse = floor(int(3.0 / 4 * graph.getVertexCount()));
+	return graph.getEdgeCount() < sparse;
 }
 
-int graph::get_rank(const edge_set& s) const {
-    // build matrix over E and S
-    matrix b(this->edges, s);
-
-    // replace indeterminate
-    b.replace_indeterminates(this->edges.edges.size());
-
-    // get max degree
-    return b.determinant().degree();
+bool PerfectMatching::isPerfectMatching(const Graph& graph, const Graph& possibleMatching) const {
+    auto halfVerticiesCount = floor(int(graph.getVertexCount() / 2.0));
+    return possibleMatching.getEdgeCount() <= halfVerticiesCount;
 }
 
-edge_set graph::get_matches() const {
-    edge_set matches;
+Graph PerfectMatching::getObviousMatches(const Graph& graph) const {
+    Graph matches;
+    auto edges = graph.getEdges();
 
-    for_each(this->edges.edges.begin(), this->edges.edges.end(), [&] (const edge& edge) {
-        // TODO START HERE: it looks like the vertex removal isn't working
-        if (edge.is_incident_with_degree(1)) {
+    for_each(edges.begin(), edges.end(), [&] (const Edge& edge) {
+        auto uDegree = graph.getDegree(edge.getU());
+        auto vDegree = graph.getDegree(edge.getV());
+        
+        if (uDegree == 1 || vDegree == 1) {
             matches.add(edge);
         }
     });
@@ -92,101 +89,76 @@ edge_set graph::get_matches() const {
     return matches;
 }
 
-void graph::remove_edges(const edge_set& edges_to_remove) {
-    vector<edge> etr;
-    for (auto it = edges_to_remove.edges.begin(); it != edges_to_remove.edges.end(); it++) {
-        auto re = this->edges.edges.find(*it);
-        if (re != this->edges.edges.end()) {
-            etr.push_back(*re);
+Graph PerfectMatching::getRedundantEdges(const Graph& graph) const {
+    //cout << "Getting redundant edges..." << endl;
+    Graph redundant;
+    // get random subset S of E
+    auto subSet = this->getRandomSubset(graph);
+    //Graph subSet;
+    //subSet.add(0,2);
+    //cout << "Random subset size of E: " << subSet.getEdgeCount() << endl;
+
+    // foreach e in E - S, if Rank(S u e) == Rank(S) => add E to RE
+    auto diff = graph.difference(subSet);
+    auto edges = diff.getEdges();
+    auto sRank = this->getRank(graph, subSet);
+    for (auto ed = edges.begin(); ed != edges.end(); ed++) {
+        Edge e(ed->getU().getId(), ed->getV().getId());
+        //cout << "Adding " << e.str() << " to s (size: " << subSet.getEdgeCount() << ")" << endl;
+        subSet.add(e);
+        //cout << "s is now size: " << subSet.getEdgeCount() << endl;
+        auto eRank = this->getRank(graph, subSet);
+        //cout << "eRank: " << eRank << " vs " << "sRank: " << sRank << endl;
+        if (eRank == sRank) {
+            redundant.add(e);
+            //cout << "*********" << e.str() << "*********" << endl;
         }
-    }
-    this->edges = this->edges.difference(edges_to_remove);
-    cout << etr.size() << endl;
-    for (int i = 0; i < etr.size(); i++) {
-        this->edges.edges.erase(etr[i]);
-        cout << etr[i].u.degree() << " / " << etr[i].v.degree() << endl;
-        etr[i].u.remove_neighbor(etr[i].v);
-        etr[i].v.remove_neighbor(etr[i].u);
-        cout << etr[i].u.degree() << " / " << etr[i].v.degree() << endl;
-        this->edges.edges.insert(etr[i]);
+        subSet.remove(e);
+        //cout << "-----------------------" << endl << endl;
     }
 
-    
+
+    return redundant;
 }
 
-void graph::remove_verticies(const unordered_set<vertex, vertex_hash>& verticies_to_remove) {
-    edge_set edges_to_remove;
-    vector<vertex> v_to_remove;
+int PerfectMatching::getRank(const Graph& e, const Graph& s) const {
+    //cout << endl << "Edge: " << e.getEdgeCount() << " / Vertex: " << e.getVertexCount() << endl;
+    // build matrix over E and S
+    matrix b(e, s);
+    auto det = b.determinant();
 
-    for_each(verticies_to_remove.begin(), verticies_to_remove.end(), [&] (const vertex& vertex) {
-        v_to_remove.push_back(vertex);
+    // replace indeterminate
+    b.replace_indeterminates(e.getEdgeCount());
 
-        for_each(this->edges.edges.begin(), this->edges.edges.end(), [&] (const edge& edge) {
-            if (edge.u.id == vertex.id || edge.v.id == vertex.id) {
-                edges_to_remove.add(edge);
-            }
-        });
+    det = b.determinant();
+    //std::cout << "Determinant after replace: " << det.str() << std::endl;
+	
+    // get max degree
+    //std::cout << "Degree: " << det.degree() << std::endl;
+    return det.degree();
+}
+
+Graph PerfectMatching::getRandomSubset(const Graph& graph) const {
+    int randomEdgesCount = this->getRandomNumber(graph);
+
+    Graph subset;
+    auto edges = graph.getEdges();
+    auto start = edges.begin();
+    auto end = next(start, randomEdgesCount);
+    for_each(start, end, [&] (const Edge& e) {
+        subset.add(e);
     });
-
-    
-    for (int i = 0; i < v_to_remove.size(); i++) {
-        v_to_remove[i].destroy();
-        this->verticies.erase(v_to_remove[i]);
-        this->verticies.insert(v_to_remove[i]);
-    } 
-    //this->verticies.erase(vertex);
-
-
-    this->edges = this->edges.difference(edges_to_remove);
-}
-
-bool graph::is_sparse() const {
-    int sparse = floor(int(3.0 / 4 * this->verticies.size()));
-	return this->edges.edges.size() < sparse;
-}
-
-bool graph::has_edges() const {
-    return this->edges.edges.size() > 0;
-}
-
-bool graph::is_perfect_matching(const edge_set& possible_matching) const {
-    int edges_in_matching_count = possible_matching.edges.size();
-    int verticies_in_graph_count = this->verticies.size();
-    int half_the_number_of_verticies = floor(int(verticies_in_graph_count / 2.0));
-    
-    return edges_in_matching_count <= half_the_number_of_verticies;
-}
-
-
-// From edge set
-
-int edge_set::getRandomNumber() const {
-    int min_edges = 1;
-    int max_edges = int(floor(5.0/6 * this->size_edges()));
-
-    random_device rd;
-    default_random_engine generator(rd());
-    uniform_int_distribution<int> distribution(min_edges, max_edges);
-
-    return distribution(generator);
-}
-
-edge_set edge_set::get_random_subset() {
-    int random_edges_count = getRandomNumber();
-
-    edge_set subset;
-    auto start = this->edges_begin();
-    auto end = next(start, random_edges_count);
-    for_each(start, end, [&] (const pair<size_t, size_t>& e) {
-        subset.add(e.first, e.second);
-    });
-    
-    //for (auto it = subset.edges_begin(); it != subset.edges_end(); it++) {
-    //    cout << it->first << " - " << it->second << endl;
-    //}
     
     return subset;
 }
 
+size_t PerfectMatching::getRandomNumber(const Graph& graph) const {
+    int minEdges = 1;
+    int maxEdges = int(floor(5.0/6 * graph.getEdgeCount()));
 
-*/
+    random_device rd;
+    default_random_engine generator(rd());
+    uniform_int_distribution<int> distribution(minEdges, maxEdges);
+
+    return distribution(generator);
+}

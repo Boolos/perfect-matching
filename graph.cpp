@@ -83,6 +83,44 @@ bool Graph::contains(const Edge& edge) const {
     }
 }
 
+Graph Graph::difference(const Graph& other) const {
+    Graph diff;
+
+    auto thisVerticies = this->_verticies;
+    auto otherVerticies = other.getVerticies();
+    for (auto vertex = thisVerticies.begin(); vertex != thisVerticies.end(); vertex++) {
+        if (other.contains(*vertex)) {
+            continue;
+        }
+
+        diff.add(*vertex);
+    }
+
+    auto thisEdges = this->getEdges();
+    auto otherEdges = other.getEdges();
+    for (auto edge = thisEdges.begin(); edge != thisEdges.end(); edge++) {
+        if (other.contains(*edge)) {
+            continue;
+        }
+
+        diff.add(*edge);
+    }
+    
+    return diff;
+}
+
+size_t Graph::getDegree(size_t id) const {
+    return this->getDegree(Vertex(id));
+}
+
+size_t Graph::getDegree(const Vertex& vertex) const {
+    auto it = this->_findVertex(vertex);
+    if (it == this->_verticies.end()) {
+        return -1;
+    }
+    return it->getDegree();
+}
+
 Edge Graph::getEdge(size_t uId, size_t vId) const {
     return this->getEdge(Vertex(uId), Vertex(vId));
 }
@@ -95,7 +133,7 @@ Edge Graph::getEdge(const Edge& edge) const {
     for (auto vertex = _verticies.begin(); vertex != _verticies.end(); vertex++) {
         auto neighbors = vertex->getNeighbors();
         for (auto neighbor = neighbors.begin(); neighbor != neighbors.end(); neighbor++) {
-            Edge e(Vertex(vertex->getId()), Vertex(neighbor->getId()));
+            Edge e(*vertex, *neighbor);
 
             if (edge == e) {
                 return e;
@@ -121,7 +159,7 @@ vector<Edge> Graph::getEdges() const {
     for (auto vertex = _verticies.begin(); vertex != _verticies.end(); vertex++) {
         auto neighbors = vertex->getNeighbors();
         for (auto neighbor = neighbors.begin(); neighbor != neighbors.end(); neighbor++) {
-            Edge e(Vertex(vertex->getId()), Vertex(neighbor->getId()));
+            Edge e(*vertex, *neighbor);
 
             if (distinctEdges.count(e.str()) > 0) {
                 continue;
@@ -188,6 +226,30 @@ bool Graph::isSubGraph(const Graph& graph) const {
     }
     
     return true;
+}
+
+Graph Graph::join(const Graph& other) const {
+    Graph joined;
+
+    auto thisVerticies = this->_verticies;
+    auto otherVerticies = other.getVerticies();
+    for (auto vertex = thisVerticies.begin(); vertex != thisVerticies.end(); vertex++) {
+        joined.add(*vertex);
+    }
+    for (auto vertex = otherVerticies.begin(); vertex != otherVerticies.end(); vertex++) {
+        joined.add(*vertex);
+    }
+
+    auto thisEdges = this->getEdges();
+    auto otherEdges = other.getEdges();
+    for (auto edge = thisEdges.begin(); edge != thisEdges.end(); edge++) {
+        joined.add(*edge);
+    }
+    for (auto edge = otherEdges.begin(); edge != otherEdges.end(); edge++) {
+        joined.add(*edge);
+    }
+    
+    return joined;
 }
 
 Graph &Graph::remove(size_t id) {
